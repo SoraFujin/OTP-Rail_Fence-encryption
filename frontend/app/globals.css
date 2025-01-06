@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --blue: #3182ce; /* Added blue color */
+  --gray-dark: #2d3748;
+  --gray-light: #edf2f7;
+  --indigo: #4f46e5; /* Indigo color for buttons */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Header Styling */
+.header {
+  @apply flex items-center justify-between bg-black text-white p-6 shadow-lg rounded-lg;
+}
+
+.header .logo {
+  @apply text-3xl font-bold hover:text-indigo-500 transition-all;
+}
+
+.logo:hover img {
+  opacity: 0.8; /* Makes the logo slightly transparent on hover */
+  transform: scale(1.1); /* Makes the logo slightly larger on hover */
+}
+
+.logo img {
+  transition: transform 0.3s ease, opacity 0.3s ease; /* Make sure the transition is applied to the image */
+}
+
+.header nav ul {
+  @apply flex space-x-8;
+}
+
+.header nav ul li a {
+  @apply text-white hover:text-indigo-500 transition-all ease-in-out duration-300 text-lg font-semibold;
+}
+
+.header .search-container {
+  @apply flex items-center border-2 border-indigo-600 rounded-full overflow-hidden transition-all duration-300 hover:scale-105;
+}
+
+.header .search-container input {
+  @apply p-2 outline-none text-black placeholder-gray-500 rounded-l-full;
+}
+
+.header .search-container button {
+  @apply bg-indigo-500 px-4 py-2 text-white font-semibold transition-all duration-300 hover:bg-indigo-400 rounded-r-full;
+}
+
+/* About Page Specific Styles */
+.about-page-container {
+  @apply bg-gray-950 p-8 min-h-screen; /* Match background color with OTP */
+}
+
+.about-page-container h1 {
+  @apply text-3xl font-bold text-center text-gray-200 drop-shadow-lg; /* Adjusted text color */
+}
+
+.project-box {
+  @apply mt-10 bg-gray-800 p-6 rounded-lg shadow-lg max-w-lg mx-auto;
+}
+
+.project-box h2 {
+  @apply text-2xl font-semibold text-center text-white;
+}
+
+.project-box p {
+  @apply mt-4 text-lg text-white text-center;
+}
+
+.github-link-container {
+  @apply mt-8 flex justify-center items-center;
+}
+
+.github-link {
+  @apply flex items-center text-xl font-semibold text-indigo-500 hover:text-indigo-400 transition-all duration-300;
+}
+
+.github-link .icon {
+  @apply mr-2;
+}
+
+/* OTP Page Styles */
+.otp-container {
+  @apply bg-gray-950 p-8 min-h-screen;
+}
+
+.otp-container h1 {
+  @apply text-4xl font-bold text-center text-gray-200 drop-shadow-lg;
+}
+
+.otp-section {
+  @apply flex gap-6 mt-12 justify-center;
+}
+
+.otp-card {
+  @apply bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-lg;
+}
+
+.otp-card h2 {
+  @apply text-2xl font-semibold text-center text-gray-200 mb-4;
+}
+
+.otp-textarea {
+  @apply w-full p-4 mt-4 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 border-gray-700 shadow-md;
+}
+
+.otp-button {
+  @apply mt-4 bg-indigo-500 text-white px-6 py-2 rounded-lg hover:bg-indigo-400 transition-all duration-300 focus:outline-none;
+}
+
+.otp-result {
+  @apply mt-6 text-center;
+}
+
+.otp-copy-buttons {
+  @apply flex justify-between gap-4 mt-4;
+}
+
+.otp-copy-button {
+  @apply bg-indigo-500 text-white px-6 py-2 rounded-lg hover:bg-indigo-400 transition-all duration-300;
+}
+
+.otp-message-textarea {
+  @apply w-full p-4 mt-2 rounded-lg text-gray-800 focus:outline-none border-gray-700 shadow-md;
+}
