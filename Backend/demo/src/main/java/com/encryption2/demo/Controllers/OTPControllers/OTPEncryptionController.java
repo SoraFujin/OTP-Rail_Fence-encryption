@@ -51,33 +51,22 @@ public class OTPEncryptionController {
     @PostMapping("/otp/decrypt")
     public String decryptText(@RequestBody OTPEncryptionRequest request) {
         try {
-            // Log request data
-            System.out.println("CipherText: " + request.getCipherText());
-            System.out.println("Key: " + request.getKey());
-
             String decodedCipherText;
 
-            // Check if cipher text is Base64 encoded
             try {
                 decodedCipherText = new String(Base64.getDecoder().decode(request.getCipherText()));
-                System.out.println("Decoded CipherText: " + decodedCipherText);
             } catch (IllegalArgumentException e) {
                 // If Base64 decoding fails, treat the cipherText as plain text
                 decodedCipherText = request.getCipherText();
-                System.out.println("CipherText is not Base64 encoded, using plain text.");
             }
 
-            // Ensure the key is long enough for the cipher text
             String key = OTPEncryption.ensureKeyLength(request.getKey(), decodedCipherText);
-            System.out.println("Key used for decryption: " + key);
 
             // Decrypt the cipher text with the provided key
             String decryptedText = OTPEncryption.decrypt(decodedCipherText, key);
-            System.out.println("Decrypted Text: " + decryptedText);
 
             return decryptedText;
         } catch (Exception e) {
-            e.printStackTrace();
             return "Decryption failed";
         }
     }

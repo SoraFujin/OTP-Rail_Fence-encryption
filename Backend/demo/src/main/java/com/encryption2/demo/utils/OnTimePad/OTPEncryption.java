@@ -83,11 +83,11 @@ public class OTPEncryption {
         // Convert the plainText and key to UTF-8 encoded byte arrays
         byte[] plainTextBytes = plainText.getBytes(StandardCharsets.UTF_8);
         byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
-
+        
         StringBuilder cipherText = new StringBuilder();
-
+        
         // Ensure the key is at least as long as the plain text
-        key = ensureKeyLength(new String(keyBytes, StandardCharsets.UTF_8), plainText);
+        // key = ensureKeyLength(new String(keyBytes, StandardCharsets.UTF_8), plainText);
 
         // XOR encryption with the UTF-8 encoded text and key
         for (int i = 0; i < plainTextBytes.length; i++) {
@@ -111,7 +111,7 @@ public class OTPEncryption {
         StringBuilder plainText = new StringBuilder();
 
         // Ensure the key is at least as long as the cipher text
-        key = ensureKeyLength(new String(keyBytes, StandardCharsets.UTF_8), cipherText);
+        // key = ensureKeyLength(new String(keyBytes, StandardCharsets.UTF_8), cipherText);
 
         // XOR decryption with the UTF-8 encoded cipher text and key
         for (int i = 0; i < cipherTextBytes.length; i++) {
