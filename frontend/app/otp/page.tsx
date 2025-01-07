@@ -12,20 +12,17 @@ const OTPPage = () => {
     const [decryptedMessage, setDecryptedMessage] = useState(""); // For the decrypted message input (encrypted text)
     const [decryptionKey, setDecryptionKey] = useState(""); // For the decryption key
     const [plainText, setPlainText] = useState(""); // For the decrypted plain text output
+
     const handleEncrypt = async () => {
         try {
-            // Ensure both the message (plainText) and key are encoded in UTF-8
-            const utf8Message = new TextEncoder().encode(message);
-            const utf8Key = new TextEncoder().encode(encryptionKey);
-
             const response = await fetch("http://localhost:8080/api/otp/encrypt", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    plainText: new TextDecoder().decode(utf8Message),
-                    key: new TextDecoder().decode(utf8Key),
+                    plainText: message, // Send message directly as plain text
+                    key: encryptionKey,  // Send encryption key directly
                 }),
             });
 
@@ -45,21 +42,28 @@ const OTPPage = () => {
 
     const handleDecrypt = async () => {
         try {
-            // Send the Base64 encoded string directly to the backend
+            // Ensure cipherText is Base64 encoded before sending it
+            const base64CipherText = btoa(decryptedMessage); // Base64 encode
+
+            console.log("Requesting decryption with:", {
+                cipherText: base64CipherText,
+                key: decryptionKey,
+            });
+
             const response = await fetch("http://localhost:8080/api/otp/decrypt", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    cipherText: decryptedMessage,  // Send the Base64 string directly
-                    key: decryptionKey,  // Send the decryption key as a string
+                    cipherText: base64CipherText, // Sending Base64 encoded data
+                    key: decryptionKey,
                 }),
             });
-    
+
             if (response.ok) {
                 const decrypted = await response.text();
-                setPlainText(decrypted);  // Set decrypted result to plainText state
+                setPlainText(decrypted);
             } else {
                 console.error("Failed to decrypt message");
                 toast.error("Decryption failed");
@@ -69,7 +73,7 @@ const OTPPage = () => {
             toast.error("Error decrypting message");
         }
     };
-    
+
     // Copy Text to Clipboard
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text).then(() => {

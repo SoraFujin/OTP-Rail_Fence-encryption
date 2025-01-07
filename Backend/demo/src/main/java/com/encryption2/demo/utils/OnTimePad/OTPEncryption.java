@@ -33,28 +33,20 @@ public class OTPEncryption {
     private String plainText;
     private String cipherText;
 
-public static void main(String[] args) throws IOException {
-    // Path to the test file you want to encrypt
-    String filePath = "C:/Users/Ahmad-Diab/Desktop/bzu/Year 3/second semester/encryption/Assigments/Assigment 2/test.txt";
+    public static void main(String[] args) throws IOException {
+        String plainText = "Hello World";
+        System.out.println("Plain text: " + plainText);
 
-    // Encrypt the file
-    String encryptedText = encryptFile(filePath);
-    String key = generateHashedKey(encryptedText);
+        String key = generateHashedKey(plainText);
+        System.out.println("Key: " + key);
 
-    // Display the encrypted content (optional)
-    System.out.println("Encrypted Text: " + encryptedText);
+        String cipherText = encrypt(plainText, key);
+        System.out.println("Cipher Text: " + cipherText);
 
-    // Define the decryption key and output file path
-    String decryptionKey = "your_decryption_key_here";  // This should match the key used for encryption
-    String decryptedOutputPath = "C:/Users/Ahmad-Diab/Desktop/decrypted_test.txt";
+        String message = decrypt(cipherText, key);
+        System.out.println("Decrypted Message: " + message);
 
-    // Decrypt the file
-    decryptFile("C:/Users/Ahmad-Diab/Desktop/test_encrypted.enc", decryptionKey, decryptedOutputPath);
-
-    // Optionally, display the decrypted content (from the output file)
-    System.out.println("Decryption completed. Check the decrypted file at: " + decryptedOutputPath);
-}
-
+    }
 
     public OTPEncryption(String key, String plainText, String cipherText) {
         this.key = key;
@@ -347,7 +339,7 @@ public static void main(String[] args) throws IOException {
         }
     }
 
-     public static void decryptFile(String encryptedFilePath, String decryptionKey, String outputFilePath) throws IOException {
+    public static void decryptFile(String encryptedFilePath, String decryptionKey, String outputFilePath) throws IOException {
         // Step 1: Read the encrypted file
         String encryptedText = readEncryptedFile(encryptedFilePath);
 

@@ -1,4 +1,0 @@
-THis is a secret message to be encrypted
-hello world
-123
-$%$#@
