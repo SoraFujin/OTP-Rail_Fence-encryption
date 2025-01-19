@@ -80,116 +80,87 @@ public class OTPEncryption {
     }
 
     public static String encrypt(String plainText, String key) {
-        // Convert the plainText and key to UTF-8 encoded byte arrays
         byte[] plainTextBytes = plainText.getBytes(StandardCharsets.UTF_8);
         byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
         
         StringBuilder cipherText = new StringBuilder();
         
-        // Ensure the key is at least as long as the plain text
-        // key = ensureKeyLength(new String(keyBytes, StandardCharsets.UTF_8), plainText);
-
-        // XOR encryption with the UTF-8 encoded text and key
         for (int i = 0; i < plainTextBytes.length; i++) {
             byte plainByte = plainTextBytes[i];
-            byte keyByte = keyBytes[i % keyBytes.length]; // Ensure key repeats if it's shorter than plainText
-            byte cipherByte = (byte) (plainByte ^ keyByte); // XOR operation
+            byte keyByte = keyBytes[i % keyBytes.length]; 
+            byte cipherByte = (byte) (plainByte ^ keyByte); 
 
             cipherText.append((char) cipherByte);
         }
 
-        // Base64 encode the resulting cipher text
         return Base64.getEncoder().encodeToString(cipherText.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     public static String decrypt(String cipherText, String key) {
-        // Decode the Base64 encoded cipher text into bytes
         byte[] cipherTextBytes = Base64.getDecoder().decode(cipherText);
-        // Convert the key to UTF-8 encoded bytes
         byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
 
         StringBuilder plainText = new StringBuilder();
 
-        // Ensure the key is at least as long as the cipher text
-        // key = ensureKeyLength(new String(keyBytes, StandardCharsets.UTF_8), cipherText);
-
-        // XOR decryption with the UTF-8 encoded cipher text and key
         for (int i = 0; i < cipherTextBytes.length; i++) {
             byte cipherByte = cipherTextBytes[i];
-            byte keyByte = keyBytes[i % keyBytes.length]; // Ensure key repeats if it's shorter than cipherText
-            byte decryptedByte = (byte) (cipherByte ^ keyByte); // XOR operation
+            byte keyByte = keyBytes[i % keyBytes.length]; 
+            byte decryptedByte = (byte) (cipherByte ^ keyByte); 
 
             plainText.append((char) decryptedByte);
         }
 
-        // Return the decrypted plain text in UTF-8 format
         return new String(plainText.toString().getBytes(), StandardCharsets.UTF_8);
     }
 
     public static String generateHashedKey(String plainText) {
         List<String> data = new ArrayList<>();
 
-        // 1. Add Current Date and Time
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
         data.add(LocalDateTime.now().format(formatter));
 
-        // 2. Add System Uptime (Milliseconds)
         long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
         data.add(String.valueOf(uptime));
 
-        // 3. Add CPU Model (cross-platform solution)
         data.add(getCPUModel());
 
-        // 4. Add Network Information (IP Address and MAC Address)
         data.add(getNetworkInfo());
 
-        // 5. Add Random Number (SecureRandom for entropy)
         SecureRandom random = new SecureRandom();
         data.add(String.valueOf(random.nextInt(999999)));
 
-        // 6. Add UUID for more randomness
         data.add(UUID.randomUUID().toString().replace("-", "").substring(0, 8));
 
-        // 7. Add NanoTime for precision
         data.add(String.valueOf(System.nanoTime() % 10000));
 
-        // 8. Add Environment Variable (User name for uniqueness)
         data.add(System.getProperty("user.name"));
 
-        // 9. Add additional random data
         for (int i = 0; i < 5; i++) {
             data.add(UUID.randomUUID().toString().replace("-", ""));
         }
 
-        // Shuffle the data to ensure randomness
         Collections.shuffle(data, new SecureRandom());
 
-        // Build the final key by concatenating the data
         StringBuilder key = new StringBuilder();
         for (String part : data) {
             key.append(part);
         }
 
-        // Hash the key using SHA-256
         String hashedKey = hashKey(key.toString());
 
-        // Ensure that the key is at least as long as the plain text
         return ensureKeyLength(hashedKey, plainText);
     }
 
     private static String generateAdditionalRandomData() {
-        // Use SecureRandom to ensure more randomness in extended key data
         SecureRandom random = new SecureRandom();
-        return new BigInteger(130, random).toString(32); // Generate a long random string
+        return new BigInteger(130, random).toString(32); 
     }
 
-    // SHA-256 Hashing Method
     private static String hashKey(String input) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
 
-            // Convert byte array to hexadecimal format
             StringBuilder hexString = new StringBuilder();
             for (byte b : hash) {
                 String hex = Integer.toHexString(0xff & b);
@@ -204,28 +175,24 @@ public class OTPEncryption {
         }
     }
 
-    // Ensure the key is at least as long as the plain text
     public static String ensureKeyLength(String key, String plainText) {
         int plainTextLength = plainText.length();
 
-        // If the key is shorter than the plain text, extend it with more random data
         if (key.length() < plainTextLength) {
             StringBuilder extendedKey = new StringBuilder(key);
             while (extendedKey.length() < plainTextLength) {
-                // Add additional random data to the key
                 extendedKey.append(generateAdditionalRandomData());
             }
-            return extendedKey.toString().substring(0, plainTextLength); // Trim to exact length if necessary
+            return extendedKey.toString().substring(0, plainTextLength); 
         }
 
-        // If the key is longer than the plain text, return the full key
-        return key.substring(0, plainTextLength); // Return key with the same length as the plain text
+        return key.substring(0, plainTextLength); 
     }
 
     private static String getCPUModel() {
         String cpuModel = "UnknownCPU";
         try {
-            Process process = Runtime.getRuntime().exec("lscpu"); // For Linux/Mac
+            Process process = Runtime.getRuntime().exec("lscpu"); 
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {
@@ -237,7 +204,7 @@ public class OTPEncryption {
         } catch (IOException e) {
             cpuModel = "ErrorReadingCPU";
         }
-        return cpuModel.replaceAll("\s", ""); // Remove spaces for consistency
+        return cpuModel.replaceAll("\s", "");
     }
 
     private static String getNetworkInfo() {
@@ -247,7 +214,6 @@ public class OTPEncryption {
             while (networkInterfaces.hasMoreElements()) {
                 NetworkInterface networkInterface = networkInterfaces.nextElement();
 
-                // Get MAC Address
                 byte[] mac = networkInterface.getHardwareAddress();
                 if (mac != null) {
                     for (byte b : mac) {
@@ -255,7 +221,6 @@ public class OTPEncryption {
                     }
                 }
 
-                // Get IP Addresses
                 Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
                 while (inetAddresses.hasMoreElements()) {
                     InetAddress inetAddress = inetAddresses.nextElement();
@@ -269,42 +234,34 @@ public class OTPEncryption {
         }
         return networkInfo.toString();
     }
-    // Encrypt a file and write the encrypted content to a new file
 
     public static String encryptFile(String filePath) throws IOException {
         File file = new File(filePath);
         boolean isBinaryFile = isBinaryFile(file);
 
-        // Step 1: Read the entire file (binary or text)
         byte[] fileBytes = readFile(file, isBinaryFile);
 
-        // Step 2: Generate a key (you can create a secure key generation logic)
         String key = OTPEncryption.generateHashedKey(new String(fileBytes)); // Use file content to generate key
 
-        // Step 3: Encrypt the file content
         String encryptedText = OTPEncryption.encrypt(new String(fileBytes), key);
 
-        // Step 4: Write the encrypted content to a new file
         writeEncryptedToFile(encryptedText, "path/to/your/output/encryptedFile.enc");
 
-        // Step 5: Optionally, encode the result to Base64 before returning
         return Base64.getEncoder().encodeToString(encryptedText.getBytes()); // Return Base64 encoded encrypted text
     }
 
-    // Check if a file is binary (based on a basic heuristic, e.g., presence of null byte)
     private static boolean isBinaryFile(File file) throws IOException {
         try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
             int byteRead;
             while ((byteRead = bis.read()) != -1) {
                 if (byteRead == 0) {
-                    return true; // Found a null byte, likely a binary file
+                    return true; 
                 }
             }
         }
         return false;
     }
 
-    // Read the file content (binary or text)
     private static byte[] readFile(File file, boolean isBinary) throws IOException {
         if (isBinary) {
             return readBinaryFile(file);
@@ -313,7 +270,6 @@ public class OTPEncryption {
         }
     }
 
-    // Read text file content
     private static String readTextFile(File file) throws IOException {
         StringBuilder content = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
@@ -325,14 +281,12 @@ public class OTPEncryption {
         return content.toString();
     }
 
-    // Read binary file content
     private static byte[] readBinaryFile(File file) throws IOException {
         try (FileInputStream fis = new FileInputStream(file)) {
             return fis.readAllBytes();
         }
     }
 
-    // Write the encrypted content to a new file
     public static void writeEncryptedToFile(String encryptedText, String outputFilePath) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilePath))) {
             writer.write(encryptedText);
@@ -340,17 +294,13 @@ public class OTPEncryption {
     }
 
     public static void decryptFile(String encryptedFilePath, String decryptionKey, String outputFilePath) throws IOException {
-        // Step 1: Read the encrypted file
         String encryptedText = readEncryptedFile(encryptedFilePath);
 
-        // Step 2: Decrypt the content
         String decryptedContent = OTPEncryption.decrypt(encryptedText, decryptionKey);
 
-        // Step 3: Write the decrypted content to a new file
         writeDecryptedToFile(decryptedContent, outputFilePath);
     }
 
-    // Read the encrypted file content
     private static String readEncryptedFile(String encryptedFilePath) throws IOException {
         StringBuilder encryptedContent = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(encryptedFilePath))) {
@@ -359,13 +309,10 @@ public class OTPEncryption {
                 encryptedContent.append(line).append("\n");
             }
         }
-        return encryptedContent.toString().trim();  // Remove extra newlines if any
+        return encryptedContent.toString().trim();  
     }
 
-    // Write the decrypted content back to a new file (binary or text)
     private static void writeDecryptedToFile(String decryptedContent, String outputFilePath) throws IOException {
-        // Assuming the decrypted content is text for simplicity
-        // In case of binary, you will need to handle byte arrays and content type
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilePath))) {
             writer.write(decryptedContent);
         }
